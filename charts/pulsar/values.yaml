@@ -591,8 +591,8 @@ broker:
     defaultNumberOfNamespaceBundles: "64"
     loadBalancerAutoUnloadSplitBundlesEnabled: "false"
     dispatcherMaxReadBatchSize: "256"
-    allowAutoTopicCreation: "true"
-    allowAutoTopicCreationType: "partitioned"
+#    allowAutoTopicCreation: "true"
+#    allowAutoTopicCreationType: "partitioned"
     # tier2
     managedLedgerOffloadDriver: "s3"
     s3ManagedLedgerOffloadBucket: "s3bucket"
