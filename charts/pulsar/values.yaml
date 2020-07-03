@@ -23,7 +23,7 @@
 ###
 
 ## Namespace to deploy pulsar
-namespace: pulsar
+namespace: default
 namespaceCreate: false
 
 ###

@@ -174,7 +174,6 @@ spec:
           name: "{{ template "pulsar.fullname" . }}-keytool-configmap"
           defaultMode: 0755
       {{- end}}
-{{- if and (and .Values.persistence .Values.volumes.persistence) .Values.zookeeper.volumes.persistence }}
   volumeClaimTemplates:
   - metadata:
       name: "{{ template "pulsar.fullname" . }}-{{ .Values.zookeeper.component }}-{{ .Values.zookeeper.volumes.data.name }}"
@@ -182,13 +181,6 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: {{ .Values.zookeeper.volumes.data.size }}
-    {{- if .Values.zookeeper.volumes.data.storageClassName }}
-      storageClassName: "{{ .Values.zookeeper.volumes.data.storageClassName }}"
-    {{- else if and (not (and .Values.volumes.local_storage .Values.zookeeper.volumes.data.local_storage)) .Values.zookeeper.volumes.data.storageClass }}
-      storageClassName: "{{ template "pulsar.fullname" . }}-{{ .Values.zookeeper.component }}-{{ .Values.zookeeper.volumes.data.name }}"
-    {{- else if and .Values.volumes.local_storage .Values.zookeeper.volumes.data.local_storage }}
-      storageClassName: "local-storage"
-    {{- end }}
-{{- end }}
+          storage: 40Gi
+      volumeMode: Filesystem
 {{- end }}

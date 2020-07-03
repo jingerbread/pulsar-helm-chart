@@ -156,7 +156,6 @@ spec:
         emptyDir: {}
       {{- end }}
       {{- include "pulsar.bookkeeper.certs.volumes" . | nindent 6 }}
-{{- if and (and .Values.persistence .Values.volumes.persistence) .Values.bookkeeper.volumes.persistence}}
   volumeClaimTemplates:
   - metadata:
       name: "{{ template "pulsar.fullname" . }}-{{ .Values.bookkeeper.component }}-{{ .Values.bookkeeper.volumes.journal.name }}"
@@ -164,27 +163,16 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: {{ .Values.bookkeeper.volumes.journal.size }}
-    {{- if .Values.bookkeeper.volumes.journal.storageClassName }}
-      storageClassName: "{{ .Values.bookkeeper.volumes.journal.storageClassName }}"
-    {{- else if and (not (and .Values.volumes.local_storage .Values.bookkeeper.volumes.journal.local_storage)) .Values.bookkeeper.volumes.journal.storageClass }}
-      storageClassName: "{{ template "pulsar.fullname" . }}-{{ .Values.bookkeeper.component }}-{{ .Values.bookkeeper.volumes.journal.name }}"
-    {{- else if and .Values.volumes.local_storage .Values.bookkeeper.volumes.journal.local_storage }}
-      storageClassName: "local-storage"
-    {{- end }}
+          storage: 750Gi
+      storageClassName: nvme-local
+      volumeMode: Filesystem
   - metadata:
       name: "{{ template "pulsar.fullname" . }}-{{ .Values.bookkeeper.component }}-{{ .Values.bookkeeper.volumes.ledgers.name }}"
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: {{ .Values.bookkeeper.volumes.ledgers.size }}
-    {{- if .Values.bookkeeper.volumes.ledgers.storageClassName }}
-      storageClassName: "{{ .Values.bookkeeper.volumes.ledgers.storageClassName }}"
-    {{- else if and (not (and .Values.volumes.local_storage .Values.bookkeeper.volumes.ledgers.local_storage)) .Values.bookkeeper.volumes.ledgers.storageClass }}
-      storageClassName: "{{ template "pulsar.fullname" . }}-{{ .Values.bookkeeper.component }}-{{ .Values.bookkeeper.volumes.ledgers.name }}"
-    {{- else if and .Values.volumes.local_storage .Values.bookkeeper.volumes.ledgers.local_storage }}
-      storageClassName: "local-storage"
-    {{- end }}
-{{- end }}
+          storage: 750Gi
+      storageClassName: nvme-local
+      volumeMode: Filesystem
 {{- end }}

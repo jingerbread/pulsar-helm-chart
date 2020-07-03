@@ -25,16 +25,10 @@ metadata:
   name: "{{ template "pulsar.fullname" . }}-{{ .Values.prometheus.component }}-{{ .Values.prometheus.volumes.data.name }}"
   namespace: {{ .Values.namespace }}
 spec:
+  accessModes: [ "ReadWriteOnce" ]
   resources:
     requests:
-      storage: {{ .Values.prometheus.volumes.data.size }}
-  accessModes: [ "ReadWriteOnce" ]
-{{- if .Values.prometheus.volumes.data.storageClassName }}
-  storageClassName: "{{ .Values.prometheus.volumes.data.storageClassName }}"
-{{- else if and (not (and .Values.volumes.local_storage .Values.prometheus.volumes.data.local_storage)) .Values.prometheus.volumes.data.storageClass }}
-  storageClassName: "{{ template "pulsar.fullname" . }}-{{ .Values.prometheus.component }}-{{ .Values.prometheus.volumes.data.name }}"
-{{- else if and .Values.volumes.local_storage .Values.prometheus.volumes.data.local_storage }}
-  storageClassName: "local-storage"
-{{- end }}
+      storage: 40Gi
+  volumeMode: Filesystem
 {{- end }}
 {{- end }}
