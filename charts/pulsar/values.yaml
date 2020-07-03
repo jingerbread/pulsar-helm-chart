@@ -80,7 +80,7 @@ components:
   # broker
   broker: true
   # functions
-  functions: true
+  functions: false
   # proxy
   proxy: true
   # toolset
@@ -386,17 +386,18 @@ bookkeeper:
   annotations: {}
   tolerations: []
   gracePeriod: 30
-  resources:
-    requests:
-      memory: 512Mi
-      cpu: 0.2
+#  resources:
+#    requests:
+#      memory: 512Mi
+#      cpu: 0.2
   volumes:
     # use a persistent volume or emptyDir
     persistence: true
     journal:
       name: journal
-      size: 10Gi
+      size: 750Gi
       local_storage: true
+      storageClassName: nvme-local
       ## If you already have an existent storage class and want to reuse it, you can specify its name with the option below
       ##
       # storageClassName: existent-storage-class
@@ -410,8 +411,9 @@ bookkeeper:
         # provisioner: kubernetes.io/gce-pd
     ledgers:
       name: ledgers
-      size: 50Gi
+      size: 750Gi
       local_storage: true
+      storageClassName: nvme-local
       ## If you already have an existent storage class and want to reuse it, you can specify its name with the option below
       ##
       # storageClassName: existent-storage-class
@@ -427,19 +429,24 @@ bookkeeper:
   ## templates/bookkeeper-configmap.yaml
   ##
   configData:
+    # `BOOKIE_MEM` is used for `bookie shell`
+    BOOKIE_MEM: >
+      -Xms10g
+      -Xmx10g
+      -XX:MaxDirectMemorySize=10g
     # we use `bin/pulsar` for starting bookie daemons
     PULSAR_MEM: >
-      -Xms128m
-      -Xmx256m
-      -XX:MaxDirectMemorySize=256m
+      -Xms10g
+      -Xmx10g
+      -XX:MaxDirectMemorySize=10g
     PULSAR_GC: >
       -XX:+UseG1GC
       -XX:MaxGCPauseMillis=10
       -XX:+ParallelRefProcEnabled
       -XX:+UnlockExperimentalVMOptions
       -XX:+DoEscapeAnalysis
-      -XX:ParallelGCThreads=4
-      -XX:ConcGCThreads=4
+      -XX:ParallelGCThreads=32
+      -XX:ConcGCThreads=32
       -XX:G1NewSizePercent=50
       -XX:+DisableExplicitGC
       -XX:-ResizePLAB
@@ -453,10 +460,10 @@ bookkeeper:
       -Xloggc:/var/log/bookie-gc.log
       -XX:G1LogLevel=finest
     # configure the memory settings based on jvm memory settings
-    dbStorage_writeCacheMaxSizeMb: "32"
-    dbStorage_readAheadCacheMaxSizeMb: "32"
-    dbStorage_rocksDB_writeBufferSizeMB: "8"
-    dbStorage_rocksDB_blockCacheSize: "8388608"
+    dbStorage_writeCacheMaxSizeMb: "4096"
+    dbStorage_readAheadCacheMaxSizeMb: "4096"
+    dbStorage_rocksDB_writeBufferSizeMB: "256"
+    dbStorage_rocksDB_blockCacheSize: "1073741824"
   ## Bookkeeper Service
   ## templates/bookkeeper-service.yaml
   ##
@@ -487,16 +494,16 @@ autorecovery:
   annotations: {}
   # tolerations: []
   gracePeriod: 30
-  resources:
-    requests:
-      memory: 64Mi
-      cpu: 0.05
+#  resources:
+#    requests:
+#      memory: 64Mi
+#      cpu: 0.05
   ## Bookkeeper auto-recovery configmap
   ## templates/autorecovery-configmap.yaml
   ##
   configData:
     BOOKIE_MEM: >
-      -Xms64m -Xmx64m
+      -Xms10g -Xmx10g
 
 ## Pulsar Zookeeper metadata. The metadata will be deployed as
 ## soon as the last zookeeper node is reachable. The deployment
@@ -551,16 +558,16 @@ broker:
   annotations: {}
   tolerations: []
   gracePeriod: 30
-  resources:
-    requests:
-      memory: 512Mi
-      cpu: 0.2
+#  resources:
+#    requests:
+#      memory: 512Mi
+#      cpu: 0.2
   ## Broker configmap
   ## templates/broker-configmap.yaml
   ##
   configData:
     PULSAR_MEM: >
-      -Xms128m -Xmx256m -XX:MaxDirectMemorySize=256m
+      -Xms8g -Xmx8g -XX:MaxDirectMemorySize=10g
     PULSAR_GC: >
       -XX:+UseG1GC
       -XX:MaxGCPauseMillis=10
@@ -569,16 +576,28 @@ broker:
       -XX:+ParallelRefProcEnabled
       -XX:+UnlockExperimentalVMOptions
       -XX:+DoEscapeAnalysis
-      -XX:ParallelGCThreads=4
-      -XX:ConcGCThreads=4
+      -XX:ParallelGCThreads=32
+      -XX:ConcGCThreads=32
       -XX:G1NewSizePercent=50
       -XX:+DisableExplicitGC
       -XX:-ResizePLAB
       -XX:+ExitOnOutOfMemoryError
       -XX:+PerfDisableSharedMem
-    managedLedgerDefaultEnsembleSize: "2"
-    managedLedgerDefaultWriteQuorum: "2"
+    PULSAR_EXTRA_OPTS: >
+      -Daws.accessKeyId=s3user -Daws.secretKey=s3secretKey
+    managedLedgerDefaultEnsembleSize: "3"
+    managedLedgerDefaultWriteQuorum: "3"
     managedLedgerDefaultAckQuorum: "2"
+    defaultNumberOfNamespaceBundles: "64"
+    loadBalancerAutoUnloadSplitBundlesEnabled: "false"
+    dispatcherMaxReadBatchSize: "256"
+    allowAutoTopicCreation: "true"
+    allowAutoTopicCreationType: "partitioned"
+    # tier2
+    managedLedgerOffloadDriver: "s3"
+    s3ManagedLedgerOffloadBucket: "s3bucket"
+    #s3ManagedLedgerOffloadRegion: "default" # TODO uncomment
+    s3ManagedLedgerOffloadServiceEndpoint: "http://s3IP:9020"
   ## Broker service
   ## templates/broker-service.yaml
   ##
@@ -632,16 +651,16 @@ proxy:
   annotations: {}
   tolerations: []
   gracePeriod: 30
-  resources:
-    requests:
-      memory: 128Mi
-      cpu: 0.2
+#  resources:
+#    requests:
+#      memory: 128Mi
+#      cpu: 0.2
   ## Proxy configmap
   ## templates/proxy-configmap.yaml
   ##
   configData:
     PULSAR_MEM: >
-      -Xms64m -Xmx64m -XX:MaxDirectMemorySize=64m
+      -Xms1g -Xmx1g -XX:MaxDirectMemorySize=1g
     PULSAR_GC: >
       -XX:+UseG1GC
       -XX:MaxGCPauseMillis=10
@@ -650,8 +669,8 @@ proxy:
       -XX:+ParallelRefProcEnabled
       -XX:+UnlockExperimentalVMOptions
       -XX:+DoEscapeAnalysis
-      -XX:ParallelGCThreads=4
-      -XX:ConcGCThreads=4
+      -XX:ParallelGCThreads=32
+      -XX:ConcGCThreads=32
       -XX:G1NewSizePercent=50
       -XX:+DisableExplicitGC
       -XX:-ResizePLAB
@@ -689,12 +708,12 @@ dashboard:
   gracePeriod: 0
   image:
     repository: apachepulsar/pulsar-dashboard
-    tag: latest
+    tag: 2.6.0
     pullPolicy: IfNotPresent
-  resources:
-    requests:
-      memory: 1Gi
-      cpu: 250m
+#  resources:
+#    requests:
+#      memory: 1Gi
+#      cpu: 250m
   ## Dashboard service
   ## templates/dashboard-service.yaml
   ##
@@ -730,10 +749,10 @@ toolset:
   annotations: {}
   tolerations: []
   gracePeriod: 30
-  resources:
-    requests:
-      memory: 256Mi
-      cpu: 0.1
+#  resources:
+#    requests:
+#      memory: 256Mi
+#      cpu: 0.1
   ## Bastion configmap
   ## templates/bastion-configmap.yaml
   ##
@@ -764,10 +783,10 @@ prometheus:
   tolerations: []
   gracePeriod: 5
   port: 9090
-  resources:
-    requests:
-      memory: 256Mi
-      cpu: 0.1
+#  resources:
+#    requests:
+#      memory: 256Mi
+#      cpu: 0.1
   volumes:
     # use a persistent volume or emptyDir
     persistence: true
@@ -804,10 +823,10 @@ grafana:
   tolerations: []
   gracePeriod: 30
   port: 3000
-  resources:
-    requests:
-      memory: 250Mi
-      cpu: 0.1
+#  resources:
+#    requests:
+#      memory: 250Mi
+#      cpu: 0.1
   ## Grafana service
   ## templates/grafana-service.yaml
   ##
@@ -855,10 +874,10 @@ pulsar_manager:
   annotations: {}
   tolerations: []
   gracePeriod: 30
-  resources:
-    requests:
-      memory: 250Mi
-      cpu: 0.1
+#  resources:
+#    requests:
+#      memory: 250Mi
+#      cpu: 0.1
   configData:
     REDIRECT_HOST: "http://127.0.0.1"
     REDIRECT_PORT: "9527"
