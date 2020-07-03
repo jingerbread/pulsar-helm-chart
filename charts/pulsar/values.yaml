@@ -598,6 +598,7 @@ broker:
     s3ManagedLedgerOffloadBucket: "s3bucket"
     #s3ManagedLedgerOffloadRegion: "default" # TODO uncomment
     s3ManagedLedgerOffloadServiceEndpoint: "http://s3IP:9020"
+    managedLedgerOffloadMaxThreads: "64"
   ## Broker service
   ## templates/broker-service.yaml
   ##
