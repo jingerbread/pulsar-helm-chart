@@ -567,7 +567,7 @@ broker:
   ##
   configData:
     PULSAR_MEM: >
-      -Xms8g -Xmx8g -XX:MaxDirectMemorySize=10g
+      -Xms8g -Xmx9g -XX:MaxDirectMemorySize=14g
     PULSAR_GC: >
       -XX:+UseG1GC
       -XX:MaxGCPauseMillis=10
@@ -598,8 +598,8 @@ broker:
     s3ManagedLedgerOffloadBucket: "s3bucket"
     s3ManagedLedgerOffloadServiceEndpoint: "http://s3IP:9020"
     managedLedgerOffloadMaxThreads: "64"
-    managedLedgerMaxEntriesPerLedger: "500"
-    managedLedgerMinLedgerRolloverTimeMinutes: "0"
+    managedLedgerMaxEntriesPerLedger: "2000"
+    managedLedgerMinLedgerRolloverTimeMinutes: "1"
   ## Broker service
   ## templates/broker-service.yaml
   ##
