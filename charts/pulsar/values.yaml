@@ -432,13 +432,13 @@ bookkeeper:
     # `BOOKIE_MEM` is used for `bookie shell`
     BOOKIE_MEM: >
       -Xms10g
-      -Xmx10g
-      -XX:MaxDirectMemorySize=10g
+      -Xmx12g
+      -XX:MaxDirectMemorySize=14g
     # we use `bin/pulsar` for starting bookie daemons
     PULSAR_MEM: >
       -Xms10g
-      -Xmx10g
-      -XX:MaxDirectMemorySize=10g
+      -Xmx12g
+      -XX:MaxDirectMemorySize=14g
     PULSAR_GC: >
       -XX:+UseG1GC
       -XX:MaxGCPauseMillis=10
