@@ -583,8 +583,9 @@ broker:
       -XX:-ResizePLAB
       -XX:+ExitOnOutOfMemoryError
       -XX:+PerfDisableSharedMem
-    PULSAR_EXTRA_OPTS: >
-      -Daws.accessKeyId=s3user -Daws.secretKey=s3secretKey
+########## tier2
+#    PULSAR_EXTRA_OPTS: >
+#      -Daws.accessKeyId=s3user -Daws.secretKey=s3secretKey
     managedLedgerDefaultEnsembleSize: "3"
     managedLedgerDefaultWriteQuorum: "3"
     managedLedgerDefaultAckQuorum: "2"
@@ -593,13 +594,13 @@ broker:
     dispatcherMaxReadBatchSize: "256"
 #    allowAutoTopicCreation: "true"
 #    allowAutoTopicCreationType: "partitioned"
-    # tier2
-    managedLedgerOffloadDriver: "s3"
-    s3ManagedLedgerOffloadBucket: "s3bucket"
-    s3ManagedLedgerOffloadServiceEndpoint: "http://s3IP:9020"
-    managedLedgerOffloadMaxThreads: "64"
-    managedLedgerMaxEntriesPerLedger: "2000"
-    managedLedgerMinLedgerRolloverTimeMinutes: "1"
+########## tier2
+#    managedLedgerOffloadDriver: "s3"
+#    s3ManagedLedgerOffloadBucket: "s3bucket"
+#    s3ManagedLedgerOffloadServiceEndpoint: "http://s3IP:9020"
+#    managedLedgerOffloadMaxThreads: "64"
+#    managedLedgerMaxEntriesPerLedger: "2000"
+#    managedLedgerMinLedgerRolloverTimeMinutes: "1"
   ## Broker service
   ## templates/broker-service.yaml
   ##
