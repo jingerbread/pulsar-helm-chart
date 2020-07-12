@@ -567,7 +567,7 @@ broker:
   ##
   configData:
     PULSAR_MEM: >
-      -Xms8g -Xmx9g -XX:MaxDirectMemorySize=14g
+      -Xms8g -Xmx9g -XX:MaxDirectMemorySize=17g
     PULSAR_GC: >
       -XX:+UseG1GC
       -XX:MaxGCPauseMillis=10
